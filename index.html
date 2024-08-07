@@ -49,73 +49,101 @@
     <main>
       hola mundo
 
-      <button class="action-btn" aria-label="cart" id="enableNotifications">
-        <i class="bx bxs-bell" aria-hidden="true"></i>
-        <span class="btn-badge" style="background-color: red">5</span>
+      <button aria-label="cart" id="enableNotifications">
+        <span class="btn-badge" style="background-color: red">Notificacion</span>
       </button>
     </main>
   </body>
 
   <script>
-    "use strict";
+// Usar modo estricto para una mejor gestión de errores y prácticas seguras
+// "use strict";
 
+// Obtener el botón de notificaciones del DOM
 const notificationButton = document.getElementById("enableNotifications");
+
+// Declarar una variable para el registro del Service Worker
 let swRegistration = null;
 
+// Inicializar la aplicación
 initializeApp();
 
+// Función para inicializar la aplicación
 function initializeApp() {
+  // Comprobar si el navegador soporta Service Worker y Push Manager
   if ("serviceWorker" in navigator && "PushManager" in window) {
-    console.log("Service Worker and Push is supported");
+    console.log("Service Worker y Push son soportados");
+    
+    // Registrar el Service Worker
     navigator.serviceWorker
-      .register("./sw.js")
+      .register("./sw.js") // Registrar el archivo sw.js
       .then(swReg => {
-        console.log("Service Worker is registered", swReg);
-
+        console.log("Service Worker registrado", swReg);
+        
+        // Guardar el registro del Service Worker
         swRegistration = swReg;
+        
+        // Inicializar la interfaz de usuario
         initializeUi();
       })
       .catch(error => {
-        console.error("Service Worker Error", error);
+        // Manejar errores en el registro del Service Worker
+        console.error("Error en el Service Worker", error);
       });
   } else {
-    console.warn("Push messaging is not supported");
-    notificationButton.textContent = "Push Not Supported";
+    // Mostrar una advertencia si el navegador no soporta Push Messaging
+    console.warn("La mensajería Push no es soportada");
+    // Cambiar el texto del botón para indicar que Push no es compatible
+    notificationButton.textContent = "Push no soportado";
   }
 }
 
+// Función para inicializar la interfaz de usuario
 function initializeUi() {
+  // Añadir un evento de clic al botón de notificaciones
   notificationButton.addEventListener("click", () => {
+    // Llamar a la función para mostrar la notificación
     displayNotification();
   });
 }
 
+// Función para manejar la solicitud de notificaciones
 function displayNotification() {
+  // Comprobar si las notificaciones están permitidas y concedidas
   if (window.Notification && Notification.permission === "granted") {
+    // Mostrar la notificación
     notification();
   }
+  // Si las notificaciones no están denegadas, solicitar permiso
   else if (window.Notification && Notification.permission !== "denied") {
     Notification.requestPermission(status => {
+      // Si el permiso es concedido, mostrar la notificación
       if (status === "granted") {
         notification();
       } else {
-        alert("You denied or dismissed permissions to notifications.");
+        // Alertar al usuario si las notificaciones fueron denegadas o desestimadas
+        alert("Negaste o rechazaste permisos para notificaciones.");
       }
     });
   } else {
+    // Alertar al usuario si las notificaciones fueron denegadas en la configuración
     alert(
-      "You denied permissions to notifications. Please go to your browser or phone setting to allow notifications."
+      "Negaste permisos para notificaciones. Por favor, ve a la configuración de tu navegador o teléfono para permitir notificaciones."
     );
   }
 }
 
+// Función para mostrar la notificación
 function notification() {
+  // Opciones de la notificación
   const options = {
-    body: "test",
-    icon: "./assets/images/logo/s2.png",
+    body: "test", // Cuerpo del mensaje de la notificación
+    icon: "./assets/images/logo/s2.png", // Icono de la notificación
   };
+  // Mostrar la notificación utilizando el Service Worker registrado
   swRegistration.showNotification("Comet Coders", options);
 }
+
   </script>
 
 </html>
