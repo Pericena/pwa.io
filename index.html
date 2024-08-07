@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WPA</title>
+    <meta name="description" content="WPA test" />
+    <meta property="og:image" content="assets/images/logo/s2.png" />
+
+    <!-- Metaetiqueta para el color de tema en dispositivos móviles -->
+    <meta name="theme-color" content="#99ca61" />
+    <!-- Metaetiquetas para optimización móvil -->
+    <meta name="MobileOptimized" content="width" />
+    <meta name="HandheldFriendly" content="true" />
+
+    <!-- Metaetiqueta para habilitar la instalación como una aplicación web en dispositivos móviles -->
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Metaetiqueta para personalizar la barra de estado en dispositivos iOS -->
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <!-- Icono de acceso directo en la barra de tareas y en dispositivos iOS -->
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="assets/images/logo/s2.png"
+    />
+    <link rel="apple-touch-icon" href="assets/images/logo/s2.png" />
+
+    <!-- Imagen de inicio en dispositivos iOS -->
+    <link rel="apple-touch-startup-image" href="assets/images/logo/s2.png" />
+
+    <!-- Archivo de manifiesto de la aplicación web -->
+    <link rel="manifest" href="./manifest.json" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="assets/images/logo/s2.png"
+      type="image/x-icon"
+    />
+  </head>
+
+  <script src="js/script_pwa.js"></script>
+  <body id="top">
+    <main>
+      hola mundo
+
+      <button class="action-btn" aria-label="cart" id="enableNotifications">
+        <i class="bx bxs-bell" aria-hidden="true"></i>
+        <span class="btn-badge" style="background-color: red">5</span>
+      </button>
+    </main>
+  </body>
+
+  <script>
+    "use strict";
+
+const notificationButton = document.getElementById("enableNotifications");
+let swRegistration = null;
+
+initializeApp();
+
+function initializeApp() {
+  if ("serviceWorker" in navigator && "PushManager" in window) {
+    console.log("Service Worker and Push is supported");
+    navigator.serviceWorker
+      .register("./sw.js")
+      .then(swReg => {
+        console.log("Service Worker is registered", swReg);
+
+        swRegistration = swReg;
+        initializeUi();
+      })
+      .catch(error => {
+        console.error("Service Worker Error", error);
+      });
+  } else {
+    console.warn("Push messaging is not supported");
+    notificationButton.textContent = "Push Not Supported";
+  }
+}
+
+function initializeUi() {
+  notificationButton.addEventListener("click", () => {
+    displayNotification();
+  });
+}
+
+function displayNotification() {
+  if (window.Notification && Notification.permission === "granted") {
+    notification();
+  }
+  else if (window.Notification && Notification.permission !== "denied") {
+    Notification.requestPermission(status => {
+      if (status === "granted") {
+        notification();
+      } else {
+        alert("You denied or dismissed permissions to notifications.");
+      }
+    });
+  } else {
+    alert(
+      "You denied permissions to notifications. Please go to your browser or phone setting to allow notifications."
+    );
+  }
+}
+
+function notification() {
+  const options = {
+    body: "test",
+    icon: "./assets/images/logo/s2.png",
+  };
+  swRegistration.showNotification("Comet Coders", options);
+}
+  </script>
+
+</html>
